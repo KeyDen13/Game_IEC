@@ -62,5 +62,3 @@ Este proyecto es un juego educativo que permite a los estudiantes aprender símb
 - CSS3 (con animaciones y diseño responsive)
 - JavaScript (vanilla, sin frameworks)
 - API de Drag and Drop de HTML5
-
-## 📁 Estructura del Proyecto
