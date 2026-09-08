@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de Símbolos Eléctricos - Ken Angel Ramos Arapa</title>
+    <meta name="author" content="Ken Angel Ramos Arapa">
+    <meta name="description" content="Juego educativo de símbolos eléctricos creado por Ken Angel Ramos Arapa">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 80px;
+        }
+
+        /* ============ ESTILOS MENÚ PRINCIPAL ============ */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin: 40px 0 20px;
+            font-size: 3em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitulo {
+            text-align: center;
+            color: rgba(255,255,255,0.9);
+            font-size: 1.3em;
+            margin-bottom: 50px;
+        }
+
+        .menu-juegos {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .juego-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            width: 300px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+            border: none;
+        }
+
+        .juego-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .juego-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .icono-juego {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .juego-card h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .juego-card p {
+            color: #666;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+        }
+
+        .num-simbolos {
+            display: inline-block;
+            background: #f0f0f0;
+            color: #666;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        /* ============ ESTILOS DEL JUEGO ============ */
+        .container-juego {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header-juego {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            color: white;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .titulo-juego {
+            font-size: 2em;
+            text-align: center;
+            flex: 1;
+            margin: 0;
+        }
+
+        .btn-volver {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-volver:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        .timer-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .timer-icon {
+            font-size: 2em;
+        }
+
+        .timer {
+            font-size: 2em;
+            font-weight: bold;
+            background: rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 10px;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .pantalla-inicio {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 500px;
+            gap: 40px;
+        }
+
+        .instrucciones {
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 30px 40px;
+            color: white;
+        }
+
+        .instrucciones h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .instrucciones ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .instrucciones li {
+            margin: 15px 0;
+            font-size: 1.2em;
+        }
+
+        .btn-iniciar {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 25px 50px;
+            border-radius: 50px;
+            font-size: 1.8em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: pulse 2s infinite;
+        }
+
+        .btn-iniciar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255,255,255,0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 20px rgba(255,255,255,0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255,255,255,0);
+            }
+        }
+
+        .area-juego {
+            display: flex;
+            gap: 30px;
+            justify-content: space-between;
+        }
+
+        .zona-arrastre, .zona-soltar {
+            flex: 1;
+        }
+
+        .zona-arrastre h3, .zona-soltar h3 {
+            color: white;
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .contenedor-imagenes, .contenedor-nombres {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 20px;
+            min-height: 400px;
+        }
+
+        .imagen-item {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            cursor: grab;
+            transition: transform 0.2s, box-shadow 0.2s, opacity 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 120px;
+            position: relative;
+        }
+
+        .imagen-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+
+        .imagen-item:active {
+            cursor: grabbing;
+        }
+
+        .imagen-item img {
+            max-width: 100%;
+            max-height: 100px;
+            object-fit: contain;
+            pointer-events: none;
+        }
+
+        .imagen-item.dragging {
+            opacity: 0.5;
+            transform: scale(0.95);
+        }
+
+        .imagen-item.matched {
+            opacity: 0.3;
+            pointer-events: none;
+            filter: grayscale(100%);
+        }
+
+        .nombre-item {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 120px;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+            font-weight: bold;
+            color: #333;
+            font-size: 0.95em;
+            position: relative;
+        }
+
+        .nombre-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+
+        .nombre-item.drag-over {
+            background-color: #e0e7ff;
+            transform: scale(1.05);
+            border: 3px dashed #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .nombre-item.matched {
+            background: #d4edda;
+            border: 3px solid #28a745;
+            pointer-events: none;
+            color: #155724;
+        }
+
+        .btn-confirmar {
+            display: block;
+            margin: 30px auto;
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            border-radius: 50px;
+            font-size: 1.3em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .btn-confirmar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            background: #218838;
+        }
+
+        /* ============ MODAL DE RESULTADOS ============ */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal-content h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+
+        .modal-content p {
+            font-size: 1.3em;
+            margin: 20px 0;
+            color: #333;
+        }
+
+        .btn-modal {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin: 10px;
+            transition: transform 0.2s;
+        }
+
+        .btn-modal:hover {
+            transform: scale(1.05);
+            background: #5a6fd8;
+        }
+
+        /* ============ ANIMACIONES ============ */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        .shake {
+            animation: shake 0.5s;
+        }
+
+        /* ============ PIE DE PÁGINA ============ */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.3);
+            color: white;
+            text-align: center;
+            padding: 15px;
+            font-size: 0.9em;
+            backdrop-filter: blur(10px);
+        }
+
+        .footer p {
+            margin: 5px 0;
+        }
+
+        .footer .nombre-autor {
+            font-weight: bold;
+            font-size: 1.1em;
+            letter-spacing: 1px;
+        }
+
+        /* ============ RESPONSIVE ============ */
+        @media (max-width: 768px) {
+            .menu-juegos {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .juego-card {
+                width: 90%;
+                max-width: 400px;
+            }
+            
+            .area-juego {
+                flex-direction: column;
+            }
+            
+            .contenedor-imagenes,
+            .contenedor-nombres {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .header-juego {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .titulo-juego {
+                font-size: 1.5em;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .footer {
+                font-size: 0.8em;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- MENÚ PRINCIPAL -->
+    <div id="menu-principal" class="container">
+        <h1>🎮 Juego de Símbolos Eléctricos</h1>
+        <p class="subtitulo">Arrastra cada imagen hasta su nombre correcto</p>
+        <p class="subtitulo" style="font-size: 1em; margin-top: -30px;">
+            Creado por: <strong>Ken Angel Ramos Arapa</strong>
+        </p>
+        <div class="menu-juegos">
+            <button class="juego-card" onclick="mostrarJuego(1)">
+                <div class="icono-juego">⚡</div>
+                <h2>Juego 1</h2>
+                <p>Símbolos básicos</p>
+                <span class="num-simbolos">9 símbolos</span>
+            </button>
+            <button class="juego-card" onclick="mostrarJuego(2)">
+                <div class="icono-juego">🔧</div>
+                <h2>Juego 2</h2>
+                <p>Contactos y detectores</p>
+                <span class="num-simbolos">8 símbolos</span>
+            </button>
+            <button class="juego-card" onclick="mostrarJuego(3)">
+                <div class="icono-juego">🛡️</div>
+                <h2>Juego 3</h2>
+                <p>Protección eléctrica</p>
+                <span class="num-simbolos">5 símbolos</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ÁREA DE JUEGO -->
+    <div id="area-juego-principal" class="container-juego" style="display: none;">
+        <div class="header-juego">
+            <button onclick="volverAlMenu()" class="btn-volver">← Volver al Menú</button>
+            <h1 class="titulo-juego" id="titulo-juego">Juego</h1>
+            <div class="timer-container">
+                <span class="timer-icon">⏱️</span>
+                <div class="timer" id="timer">01:00</div>
+            </div>
+        </div>
+        
+        <div id="pantalla-inicio" class="pantalla-inicio">
+            <div class="instrucciones">
+                <h2>Instrucciones</h2>
+                <ul>
+                    <li>🖱️ Arrastra cada imagen hasta su nombre correcto</li>
+                    <li>⏱️ Tienes 1 minuto para completar el juego</li>
+                    <li>✅ Presiona "Confirmar" cuando hayas terminado</li>
+                </ul>
+            </div>
+            <button onclick="iniciarJuego()" class="btn-iniciar">INICIAR JUEGO</button>
+        </div>
+        
+        <div id="area-juego" class="area-juego" style="display: none;">
+            <div class="zona-arrastre">
+                <h3>Imágenes</h3>
+                <div class="contenedor-imagenes" id="contenedor-imagenes"></div>
+            </div>
+            <div class="zona-soltar">
+                <h3>Nombres</h3>
+                <div class="contenedor-nombres" id="contenedor-nombres"></div>
+            </div>
+        </div>
+        
+        <button id="btn-confirmar" onclick="confirmarJuego()" class="btn-confirmar" style="display: none;">
+            ✅ CONFIRMAR RESPUESTAS
+        </button>
+    </div>
+
+    <!-- PIE DE PÁGINA -->
+    <div class="footer">
+        <p class="nombre-autor">© 2024 Ken Angel Ramos Arapa</p>
+        <p>Juego de Símbolos Eléctricos - Todos los derechos reservados</p>
+    </div>
+
+    <script>
+        /*
+         * Juego de Símbolos Eléctricos
+         * Desarrollado por: Ken Angel Ramos Arapa
+         * Fecha: 2024
+         * Descripción: Juego educativo interactivo para aprender símbolos eléctricos
+         */
+        
+        // Datos de los juegos
+        const juegos = {
+            1: {
+                nombre: "Juego 1: Símbolos Básicos",
+                imagenes: [
+                    "Bobina.png",
+                    "Conjunto_de_interruptor_de_posicion.png",
+                    "Interruptor_giratorio_fijo.png",
+                    "Interruptor_parada_de_emergencia.png",
+                    "Lampara.png",
+                    "Pulsador_NA.png",
+                    "Sirena.png",
+                    "Temporizador_a_la_conexion.png",
+                    "Temporizador_a_la_desconexion.png"
+                ]
+            },
+            2: {
+                nombre: "Juego 2: Contactos y Detectores",
+                imagenes: [
+                    "Contacto_con_apertura_tardia.png",
+                    "Contacto_con_retraso_a_cierre.png",
+                    "Detector_capacitivo_NA.png",
+                    "Detector_inductivo_NA.png",
+                    "Final_de_carrera_de_rodillo_NA.png",
+                    "Interruptor.png",
+                    "Interruptor_horario.png",
+                    "Interruptor_sensible_a_la_temperatura.png"
+                ]
+            },
+            3: {
+                nombre: "Juego 3: Protección Eléctrica",
+                imagenes: [
+                    "Fusible_monofasico.png",
+                    "Interruptor_diferencial_tetrapolar.png",
+                    "Interruptor_magnetotermico.png",
+                    "Interruptor_termico.png",
+                    "Interruptor_trifasico_con_fusibles_de_percusion.png"
+                ]
+            }
+        };
+
+        // Variables globales
+        let timerInterval;
+        let tiempoRestante = 60;
+        let juegoActual = null;
+        let elementosImagen = [];
+        let elementosNombre = [];
+        let emparejamientosCorrectos = 0;
+
+        // Función para mostrar el juego seleccionado
+        function mostrarJuego(numeroJuego) {
+            juegoActual = numeroJuego;
+            document.getElementById('menu-principal').style.display = 'none';
+            document.getElementById('area-juego-principal').style.display = 'block';
+            document.getElementById('titulo-juego').textContent = juegos[numeroJuego].nombre;
+            
+            // Resetear pantalla
+            document.getElementById('pantalla-inicio').style.display = 'flex';
+            document.getElementById('area-juego').style.display = 'none';
+            document.getElementById('btn-confirmar').style.display = 'none';
+            
+            // Limpiar timer si existe
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            
+            // Resetear timer display
+            document.getElementById('timer').textContent = '01:00';
+            document.getElementById('timer').style.color = 'white';
+            document.getElementById('timer').style.animation = '';
+        }
+
+        function volverAlMenu() {
+            // Limpiar timer
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            
+            document.getElementById('menu-principal').style.display = 'block';
+            document.getElementById('area-juego-principal').style.display = 'none';
+            
+            // Resetear variables
+            elementosImagen = [];
+            elementosNombre = [];
+            emparejamientosCorrectos = 0;
+        }
+
+        function generarNombreDesdeArchivo(nombreArchivo) {
+            return nombreArchivo
+                .replace('.png', '')
+                .replace(/_/g, ' ')
+                .replace(/\b\w/g, l => l.toUpperCase());
+        }
+
+        function iniciarJuego() {
+            emparejamientosCorrectos = 0;
+            elementosImagen = [];
+            elementosNombre = [];
+            
+            document.getElementById('pantalla-inicio').style.display = 'none';
+            document.getElementById('area-juego').style.display = 'flex';
+            document.getElementById('btn-confirmar').style.display = 'block';
+            
+            iniciarTimer();
+            cargarElementosJuego();
+        }
+
+        function cargarElementosJuego() {
+            const imagenesJuego = juegos[juegoActual].imagenes;
+            const contenedorImagenes = document.getElementById('contenedor-imagenes');
+            const contenedorNombres = document.getElementById('contenedor-nombres');
+            
+            contenedorImagenes.innerHTML = '';
+            contenedorNombres.innerHTML = '';
+            
+            const nombresOriginales = imagenesJuego.map(img => generarNombreDesdeArchivo(img));
+            const imagenesBarajadas = [...imagenesJuego].sort(() => Math.random() - 0.5);
+            const nombresBarajados = [...nombresOriginales].sort(() => Math.random() - 0.5);
+            
+            imagenesBarajadas.forEach((imagen) => {
+                const div = document.createElement('div');
+                div.className = 'imagen-item';
+                div.draggable = true;
+                div.dataset.nombreOriginal = generarNombreDesdeArchivo(imagen);
+                div.dataset.emparejado = 'false';
+                
+                div.innerHTML = `<img src="imagenes/juego${juegoActual}/${imagen}" alt="${generarNombreDesdeArchivo(imagen)}" onerror="this.parentElement.innerHTML='<div style=\'text-align:center\'><p>Imagen no encontrada</p><p style=\'font-size:0.8em;color:#666\'>${imagen}</p></div>'">`;
+                
+                div.addEventListener('dragstart', handleDragStart);
+                div.addEventListener('dragend', handleDragEnd);
+                
+                contenedorImagenes.appendChild(div);
+                elementosImagen.push(div);
+            });
+            
+            nombresBarajados.forEach((nombre) => {
+                const div = document.createElement('div');
+                div.className = 'nombre-item';
+                div.textContent = nombre;
+                div.dataset.nombreOriginal = nombre;
+                div.dataset.emparejado = 'false';
+                
+                div.addEventListener('dragover', handleDragOver);
+                div.addEventListener('dragleave', handleDragLeave);
+                div.addEventListener('drop', handleDrop);
+                
+                contenedorNombres.appendChild(div);
+                elementosNombre.push(div);
+            });
+        }
+
+        function handleDragStart(e) {
+            if (this.dataset.emparejado === 'true') {
+                e.preventDefault();
+                return;
+            }
+            this.classList.add('dragging');
+            e.dataTransfer.setData('text/plain', this.dataset.nombreOriginal);
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleDragEnd(e) {
+            this.classList.remove('dragging');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            if (this.dataset.emparejado !== 'true') {
+                e.dataTransfer.dropEffect = 'move';
+                this.classList.add('drag-over');
+            }
+        }
+
+        function handleDragLeave(e) {
+            this.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            this.classList.remove('drag-over');
+            
+            if (this.dataset.emparejado === 'true') {
+                return;
+            }
+            
+            const nombreImagenArrastrada = e.dataTransfer.getData('text/plain');
+            const nombreElemento = this.dataset.nombreOriginal;
+            
+            if (nombreImagenArrastrada === nombreElemento) {
+                this.classList.add('matched');
+                this.dataset.emparejado = 'true';
+                
+                const imagenElement = elementosImagen.find(el => 
+                    el.dataset.nombreOriginal === nombreImagenArrastrada && 
+                    el.dataset.emparejado === 'false'
+                );
+                
+                if (imagenElement) {
+                    imagenElement.style.opacity = '0.3';
+                    imagenElement.style.pointerEvents = 'none';
+                    imagenElement.draggable = false;
+                    imagenElement.dataset.emparejado = 'true';
+                    imagenElement.classList.remove('dragging');
+                    imagenElement.classList.add('matched');
+                }
+                
+                emparejamientosCorrectos++;
+                
+                if (emparejamientosCorrectos === elementosNombre.length) {
+                    clearInterval(timerInterval);
+                    setTimeout(() => {
+                        mostrarResultado(true);
+                    }, 500);
+                }
+            } else {
+                this.style.backgroundColor = '#f8d7da';
+                this.classList.add('shake');
+                setTimeout(() => {
+                    this.style.backgroundColor = 'white';
+                    this.classList.remove('shake');
+                }, 500);
+            }
+        }
+
+        function iniciarTimer() {
+            tiempoRestante = 60;
+            actualizarDisplayTimer();
+            
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            
+            timerInterval = setInterval(() => {
+                tiempoRestante--;
+                actualizarDisplayTimer();
+                
+                if (tiempoRestante <= 0) {
+                    clearInterval(timerInterval);
+                    deshabilitarJuego();
+                    mostrarResultado(false);
+                }
+            }, 1000);
+        }
+
+        function actualizarDisplayTimer() {
+            const minutos = Math.floor(tiempoRestante / 60);
+            const segundos = tiempoRestante % 60;
+            const timerElement = document.getElementById('timer');
+            
+            timerElement.textContent = 
+                `${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+            
+            if (tiempoRestante <= 10) {
+                timerElement.style.color = '#ff4444';
+                timerElement.style.animation = 'pulse 1s infinite';
+            } else {
+                timerElement.style.color = 'white';
+                timerElement.style.animation = '';
+            }
+        }
+
+        function deshabilitarJuego() {
+            elementosImagen.forEach(el => {
+                el.draggable = false;
+                el.style.pointerEvents = 'none';
+            });
+            
+            elementosNombre.forEach(el => {
+                el.style.pointerEvents = 'none';
+            });
+        }
+
+        function confirmarJuego() {
+            clearInterval(timerInterval);
+            
+            const total = elementosNombre.length;
+            const correctos = emparejamientosCorrectos;
+            
+            mostrarResultado(correctos === total, correctos, total);
+        }
+
+        function mostrarResultado(completado, correctos = null, total = null) {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.style.display = 'flex';
+            
+            const contenido = document.createElement('div');
+            contenido.className = 'modal-content';
+            
+            if (completado) {
+                const tiempoUsado = 60 - tiempoRestante;
+                const minutos = Math.floor(tiempoUsado / 60);
+                const segundos = tiempoUsado % 60;
+                
+                contenido.innerHTML = `
+                    <h2>¡Excelente! 🎉</h2>
+                    <p>Has completado el juego correctamente</p>
+                    <p>Tiempo utilizado: ${minutos}:${segundos.toString().padStart(2, '0')}</p>
+                    <button class="btn-modal" onclick="reiniciarJuegoActual()">Jugar de nuevo</button>
+                    <button class="btn-modal" onclick="cerrarModalYVolver()">Volver al menú</button>
+                `;
+            } else {
+                const resultado = correctos !== null ? 
+                    `<p>Has acertado ${correctos} de ${total} emparejamientos</p>` : 
+                    '<p>Se acabó el tiempo</p>';
+                
+                contenido.innerHTML = `
+                    <h2>${correctos !== null ? 'Resultado' : '¡Tiempo agotado! ⏰'}</h2>
+                    ${resultado}
+                    <button class="btn-modal" onclick="reiniciarJuegoActual()">Intentar de nuevo</button>
+                    <button class="btn-modal" onclick="cerrarModalYVolver()">Volver al menú</button>
+                `;
+            }
+            
+            modal.appendChild(contenido);
+            document.body.appendChild(modal);
+        }
+
+        function reiniciarJuegoActual() {
+            // Eliminar modal
+            const modal = document.querySelector('.modal');
+            if (modal) {
+                modal.remove();
+            }
+            
+            // Resetear juego
+            mostrarJuego(juegoActual);
+        }
+
+        function cerrarModalYVolver() {
+            const modal = document.querySelector('.modal');
+            if (modal) {
+                modal.remove();
+            }
+            
+            volverAlMenu();
+        }
+    </script>
+</body>
+</html>
