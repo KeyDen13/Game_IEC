@@ -220,15 +220,9 @@
         }
 
         @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(255,255,255,0.7);
-            }
-            70% {
-                box-shadow: 0 0 0 20px rgba(255,255,255,0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(255,255,255,0);
-            }
+            0% { box-shadow: 0 0 0 0 rgba(255,255,255,0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(255,255,255,0); }
+            100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
         }
 
         .area-juego {
@@ -293,10 +287,29 @@
             transform: scale(0.95);
         }
 
-        .imagen-item.matched {
-            opacity: 0.3;
-            pointer-events: none;
-            filter: grayscale(100%);
+        /* Estilo para imagen colocada en un nombre */
+        .nombre-item .imagen-colocada {
+            background: transparent;
+            padding: 5px;
+            min-height: auto;
+            box-shadow: none;
+            cursor: grab;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nombre-item .imagen-colocada:hover {
+            transform: scale(1.05);
+            box-shadow: none;
+        }
+
+        .nombre-item .imagen-colocada img {
+            max-width: 90%;
+            max-height: 90px;
+            object-fit: contain;
         }
 
         .nombre-item {
@@ -314,6 +327,7 @@
             color: #333;
             font-size: 0.95em;
             position: relative;
+            overflow: hidden;
         }
 
         .nombre-item:hover {
@@ -328,11 +342,23 @@
             box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
         }
 
-        .nombre-item.matched {
+        /* Estados de validación al confirmar */
+        .nombre-item.correcto {
             background: #d4edda;
             border: 3px solid #28a745;
-            pointer-events: none;
             color: #155724;
+        }
+
+        .nombre-item.incorrecto {
+            background: #f8d7da;
+            border: 3px solid #dc3545;
+            color: #721c24;
+        }
+
+        .nombre-item.vacio {
+            background: #fff3cd;
+            border: 3px solid #ffc107;
+            color: #856404;
         }
 
         .btn-confirmar {
@@ -409,17 +435,6 @@
             background: #5a6fd8;
         }
 
-        /* ============ ANIMACIONES ============ */
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
-        }
-
-        .shake {
-            animation: shake 0.5s;
-        }
-
         /* ============ PIE DE PÁGINA ============ */
         .footer {
             position: fixed;
@@ -446,42 +461,14 @@
 
         /* ============ RESPONSIVE ============ */
         @media (max-width: 768px) {
-            .menu-juegos {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .juego-card {
-                width: 90%;
-                max-width: 400px;
-            }
-            
-            .area-juego {
-                flex-direction: column;
-            }
-            
-            .contenedor-imagenes,
-            .contenedor-nombres {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .header-juego {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .titulo-juego {
-                font-size: 1.5em;
-            }
-            
-            h1 {
-                font-size: 2em;
-            }
-            
-            .footer {
-                font-size: 0.8em;
-                padding: 10px;
-            }
+            .menu-juegos { flex-direction: column; align-items: center; }
+            .juego-card { width: 90%; max-width: 400px; }
+            .area-juego { flex-direction: column; }
+            .contenedor-imagenes, .contenedor-nombres { grid-template-columns: repeat(2, 1fr); }
+            .header-juego { flex-direction: column; align-items: center; }
+            .titulo-juego { font-size: 1.5em; }
+            h1 { font-size: 2em; }
+            .footer { font-size: 0.8em; padding: 10px; }
         }
     </style>
 </head>
@@ -531,8 +518,9 @@
                 <h2>Instrucciones</h2>
                 <ul>
                     <li>🖱️ Arrastra cada imagen hasta su nombre correcto</li>
+                    <li>🔀 Puedes mover las imágenes las veces que quieras</li>
                     <li>⏱️ Tienes 1 minuto para completar el juego</li>
-                    <li>✅ Presiona "Confirmar" cuando hayas terminado</li>
+                    <li>✅ Al presionar "Confirmar" se validarán tus respuestas</li>
                 </ul>
             </div>
             <button onclick="iniciarJuego()" class="btn-iniciar">INICIAR JUEGO</button>
@@ -556,7 +544,7 @@
 
     <!-- PIE DE PÁGINA -->
     <div class="footer">
-        <p class="nombre-autor">© 2024 Ken Angel Ramos Arapa</p>
+        <p class="nombre-autor">© 2026 Ken Angel Ramos Arapa</p>
         <p>Juego de Símbolos Eléctricos - Todos los derechos reservados</p>
     </div>
 
@@ -564,10 +552,9 @@
         /*
          * Juego de Símbolos Eléctricos
          * Desarrollado por: Ken Angel Ramos Arapa
-         * Fecha: 2024
-         * Descripción: Juego educativo interactivo para aprender símbolos eléctricos
+         * Fecha: 2026
          */
-        
+
         // Datos de los juegos
         const juegos = {
             1: {
@@ -615,44 +602,35 @@
         let juegoActual = null;
         let elementosImagen = [];
         let elementosNombre = [];
-        let emparejamientosCorrectos = 0;
+        let imagenesColocadas = {}; // { nombreDestino: nombreImagen }
 
-        // Función para mostrar el juego seleccionado
+        // ============ FUNCIONES DE NAVEGACIÓN ============
         function mostrarJuego(numeroJuego) {
             juegoActual = numeroJuego;
             document.getElementById('menu-principal').style.display = 'none';
             document.getElementById('area-juego-principal').style.display = 'block';
             document.getElementById('titulo-juego').textContent = juegos[numeroJuego].nombre;
             
-            // Resetear pantalla
             document.getElementById('pantalla-inicio').style.display = 'flex';
             document.getElementById('area-juego').style.display = 'none';
             document.getElementById('btn-confirmar').style.display = 'none';
             
-            // Limpiar timer si existe
-            if (timerInterval) {
-                clearInterval(timerInterval);
-            }
+            if (timerInterval) clearInterval(timerInterval);
             
-            // Resetear timer display
             document.getElementById('timer').textContent = '01:00';
             document.getElementById('timer').style.color = 'white';
             document.getElementById('timer').style.animation = '';
         }
 
         function volverAlMenu() {
-            // Limpiar timer
-            if (timerInterval) {
-                clearInterval(timerInterval);
-            }
+            if (timerInterval) clearInterval(timerInterval);
             
             document.getElementById('menu-principal').style.display = 'block';
             document.getElementById('area-juego-principal').style.display = 'none';
             
-            // Resetear variables
             elementosImagen = [];
             elementosNombre = [];
-            emparejamientosCorrectos = 0;
+            imagenesColocadas = {};
         }
 
         function generarNombreDesdeArchivo(nombreArchivo) {
@@ -663,9 +641,9 @@
         }
 
         function iniciarJuego() {
-            emparejamientosCorrectos = 0;
             elementosImagen = [];
             elementosNombre = [];
+            imagenesColocadas = {};
             
             document.getElementById('pantalla-inicio').style.display = 'none';
             document.getElementById('area-juego').style.display = 'flex';
@@ -687,12 +665,13 @@
             const imagenesBarajadas = [...imagenesJuego].sort(() => Math.random() - 0.5);
             const nombresBarajados = [...nombresOriginales].sort(() => Math.random() - 0.5);
             
+            // Crear elementos de imágenes
             imagenesBarajadas.forEach((imagen) => {
                 const div = document.createElement('div');
                 div.className = 'imagen-item';
                 div.draggable = true;
                 div.dataset.nombreOriginal = generarNombreDesdeArchivo(imagen);
-                div.dataset.emparejado = 'false';
+                div.dataset.archivoImagen = imagen;
                 
                 div.innerHTML = `<img src="imagenes/juego${juegoActual}/${imagen}" alt="${generarNombreDesdeArchivo(imagen)}" onerror="this.parentElement.innerHTML='<div style=\'text-align:center\'><p>Imagen no encontrada</p><p style=\'font-size:0.8em;color:#666\'>${imagen}</p></div>'">`;
                 
@@ -703,12 +682,12 @@
                 elementosImagen.push(div);
             });
             
+            // Crear elementos de nombres
             nombresBarajados.forEach((nombre) => {
                 const div = document.createElement('div');
                 div.className = 'nombre-item';
                 div.textContent = nombre;
                 div.dataset.nombreOriginal = nombre;
-                div.dataset.emparejado = 'false';
                 
                 div.addEventListener('dragover', handleDragOver);
                 div.addEventListener('dragleave', handleDragLeave);
@@ -719,13 +698,27 @@
             });
         }
 
+        // ============ DRAG AND DROP ============
         function handleDragStart(e) {
-            if (this.dataset.emparejado === 'true') {
-                e.preventDefault();
-                return;
-            }
+            // Solo se puede arrastrar si el juego está activo
+            if (!timerInterval) return;
+            
             this.classList.add('dragging');
-            e.dataTransfer.setData('text/plain', this.dataset.nombreOriginal);
+            
+            // Guardar info de la imagen
+            const infoImagen = {
+                nombreOriginal: this.dataset.nombreOriginal,
+                archivoImagen: this.dataset.archivoImagen,
+                idElemento: this.id,
+                fromContenedor: this.parentElement.id
+            };
+            
+            // Si viene de un nombre, también guardamos de dónde viene
+            if (this.parentElement.classList.contains('nombre-item')) {
+                infoImagen.fromNombre = this.parentElement.dataset.nombreOriginal;
+            }
+            
+            e.dataTransfer.setData('application/json', JSON.stringify(infoImagen));
             e.dataTransfer.effectAllowed = 'move';
         }
 
@@ -735,10 +728,9 @@
 
         function handleDragOver(e) {
             e.preventDefault();
-            if (this.dataset.emparejado !== 'true') {
-                e.dataTransfer.dropEffect = 'move';
-                this.classList.add('drag-over');
-            }
+            if (!timerInterval) return;
+            e.dataTransfer.dropEffect = 'move';
+            this.classList.add('drag-over');
         }
 
         function handleDragLeave(e) {
@@ -749,56 +741,86 @@
             e.preventDefault();
             this.classList.remove('drag-over');
             
-            if (this.dataset.emparejado === 'true') {
+            if (!timerInterval) return;
+            
+            let infoImagen;
+            try {
+                infoImagen = JSON.parse(e.dataTransfer.getData('application/json'));
+            } catch (err) {
                 return;
             }
             
-            const nombreImagenArrastrada = e.dataTransfer.getData('text/plain');
-            const nombreElemento = this.dataset.nombreOriginal;
+            if (!infoImagen) return;
             
-            if (nombreImagenArrastrada === nombreElemento) {
-                this.classList.add('matched');
-                this.dataset.emparejado = 'true';
-                
-                const imagenElement = elementosImagen.find(el => 
-                    el.dataset.nombreOriginal === nombreImagenArrastrada && 
-                    el.dataset.emparejado === 'false'
-                );
-                
-                if (imagenElement) {
-                    imagenElement.style.opacity = '0.3';
-                    imagenElement.style.pointerEvents = 'none';
-                    imagenElement.draggable = false;
-                    imagenElement.dataset.emparejado = 'true';
-                    imagenElement.classList.remove('dragging');
-                    imagenElement.classList.add('matched');
-                }
-                
-                emparejamientosCorrectos++;
-                
-                if (emparejamientosCorrectos === elementosNombre.length) {
-                    clearInterval(timerInterval);
-                    setTimeout(() => {
-                        mostrarResultado(true);
-                    }, 500);
-                }
-            } else {
-                this.style.backgroundColor = '#f8d7da';
-                this.classList.add('shake');
-                setTimeout(() => {
-                    this.style.backgroundColor = 'white';
-                    this.classList.remove('shake');
-                }, 500);
+            // Solo permitir soltar en nombre-item
+            if (!this.classList.contains('nombre-item')) return;
+            
+            // Si el nombre ya tiene una imagen, devolverla al contenedor original
+            if (this.querySelector('.imagen-colocada')) {
+                const imagenExistente = this.querySelector('.imagen-colocada');
+                devolverImagenAContenedor(imagenExistente);
             }
+            
+            // Si la imagen viene de otro nombre, limpiar ese nombre
+            if (infoImagen.fromNombre) {
+                const nombreOrigen = elementosNombre.find(n => 
+                    n.dataset.nombreOriginal === infoImagen.fromNombre
+                );
+                if (nombreOrigen) {
+                    nombreOrigen.innerHTML = nombreOrigen.dataset.nombreOriginal;
+                }
+                delete imagenesColocadas[infoImagen.fromNombre];
+            }
+            
+            // Buscar el elemento de la imagen original
+            let imagenElement;
+            if (infoImagen.fromContenedor === 'contenedor-imagenes') {
+                imagenElement = elementosImagen.find(img => 
+                    img.dataset.nombreOriginal === infoImagen.nombreOriginal && 
+                    img.parentElement.id === 'contenedor-imagenes'
+                );
+            } else {
+                // Venía de otro nombre, la buscamos ahí
+                const nombreOrigen = elementosNombre.find(n => 
+                    n.dataset.nombreOriginal === infoImagen.fromNombre
+                );
+                if (nombreOrigen) {
+                    imagenElement = nombreOrigen.querySelector('.imagen-colocada');
+                }
+            }
+            
+            if (!imagenElement) return;
+            
+            // Remover del contenedor original
+            imagenElement.remove();
+            
+            // Guardar el texto original del nombre y limpiarlo
+            const nombreTexto = this.dataset.nombreOriginal;
+            
+            // Guardar qué imagen está en qué nombre
+            imagenesColocadas[nombreTexto] = infoImagen.nombreOriginal;
+            
+            // Colocar la imagen dentro del nombre
+            this.innerHTML = '';
+            this.appendChild(imagenElement);
+            imagenElement.classList.add('imagen-colocada');
+            imagenElement.draggable = true;
+            imagenElement.dataset.fromNombre = nombreTexto;
         }
 
+        function devolverImagenAContenedor(imagenElement) {
+            const contenedorImagenes = document.getElementById('contenedor-imagenes');
+            imagenElement.classList.remove('imagen-colocada');
+            contenedorImagenes.appendChild(imagenElement);
+            imagenElement.draggable = true;
+        }
+
+        // ============ TIMER ============
         function iniciarTimer() {
             tiempoRestante = 60;
             actualizarDisplayTimer();
             
-            if (timerInterval) {
-                clearInterval(timerInterval);
-            }
+            if (timerInterval) clearInterval(timerInterval);
             
             timerInterval = setInterval(() => {
                 tiempoRestante--;
@@ -806,8 +828,9 @@
                 
                 if (tiempoRestante <= 0) {
                     clearInterval(timerInterval);
+                    timerInterval = null;
                     deshabilitarJuego();
-                    mostrarResultado(false);
+                    confirmarJuego(true);
                 }
             }, 1000);
         }
@@ -837,19 +860,50 @@
             
             elementosNombre.forEach(el => {
                 el.style.pointerEvents = 'none';
+                const img = el.querySelector('.imagen-colocada');
+                if (img) img.draggable = false;
             });
         }
 
-        function confirmarJuego() {
+        // ============ VALIDACIÓN AL CONFIRMAR ============
+        function confirmarJuego(porTiempo = false) {
             clearInterval(timerInterval);
+            timerInterval = null;
             
+            let correctos = 0;
             const total = elementosNombre.length;
-            const correctos = emparejamientosCorrectos;
             
-            mostrarResultado(correctos === total, correctos, total);
+            // Validar cada nombre
+            elementosNombre.forEach(nombreEl => {
+                const nombreTexto = nombreEl.dataset.nombreOriginal;
+                const imagenColocada = imagenesColocadas[nombreTexto];
+                
+                // Limpiar clases previas
+                nombreEl.classList.remove('correcto', 'incorrecto', 'vacio');
+                
+                if (!imagenColocada) {
+                    // No tiene imagen
+                    nombreEl.classList.add('vacio');
+                } else if (imagenColocada === nombreTexto) {
+                    // Correcto
+                    nombreEl.classList.add('correcto');
+                    correctos++;
+                } else {
+                    // Incorrecto
+                    nombreEl.classList.add('incorrecto');
+                }
+            });
+            
+            deshabilitarJuego();
+            
+            // Mostrar resultado después de un momento para que se vean los colores
+            setTimeout(() => {
+                mostrarResultado(correctos === total, correctos, total, porTiempo);
+            }, 1500);
         }
 
-        function mostrarResultado(completado, correctos = null, total = null) {
+        // ============ MOSTRAR RESULTADOS ============
+        function mostrarResultado(completado, correctos = null, total = null, porTiempo = false) {
             const modal = document.createElement('div');
             modal.className = 'modal';
             modal.style.display = 'flex';
@@ -870,12 +924,19 @@
                     <button class="btn-modal" onclick="cerrarModalYVolver()">Volver al menú</button>
                 `;
             } else {
+                let titulo = 'Resultado';
+                if (porTiempo && correctos === 0) {
+                    titulo = '¡Tiempo agotado! ⏰';
+                } else if (porTiempo) {
+                    titulo = '¡Tiempo agotado! ⏰';
+                }
+                
                 const resultado = correctos !== null ? 
-                    `<p>Has acertado ${correctos} de ${total} emparejamientos</p>` : 
+                    `<p>Has acertado <strong>${correctos}</strong> de <strong>${total}</strong> emparejamientos</p>` : 
                     '<p>Se acabó el tiempo</p>';
                 
                 contenido.innerHTML = `
-                    <h2>${correctos !== null ? 'Resultado' : '¡Tiempo agotado! ⏰'}</h2>
+                    <h2>${titulo}</h2>
                     ${resultado}
                     <button class="btn-modal" onclick="reiniciarJuegoActual()">Intentar de nuevo</button>
                     <button class="btn-modal" onclick="cerrarModalYVolver()">Volver al menú</button>
@@ -887,21 +948,15 @@
         }
 
         function reiniciarJuegoActual() {
-            // Eliminar modal
             const modal = document.querySelector('.modal');
-            if (modal) {
-                modal.remove();
-            }
+            if (modal) modal.remove();
             
-            // Resetear juego
             mostrarJuego(juegoActual);
         }
 
         function cerrarModalYVolver() {
             const modal = document.querySelector('.modal');
-            if (modal) {
-                modal.remove();
-            }
+            if (modal) modal.remove();
             
             volverAlMenu();
         }
